@@ -8,7 +8,6 @@
 python -m venv .venv
 source .venv/bin/activate
 pip install -r requirements.txt
-```bash
 
 
 # 1) create env and install deps
@@ -27,3 +26,6 @@ python -m habit_tracker.cli
 
 # 4) run tests
 pytest -q
+```bash
+
+# Hello
