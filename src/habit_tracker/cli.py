@@ -1,12 +1,12 @@
 """
-Simple interactive CLI for the Habit Tracker.
+Interactive CLI for the Habit Tracker.
 
-Users can:
-- create/delete habits
-- mark a completion
-- list habits (all / by periodicity)
-- view analytics (longest streak overall / for a given habit)
-- load demo data (seed)
+Features:
+- Create/delete habits
+- Mark completions (now)
+- List habits (all / by periodicity)
+- View analytics (longest streaks)
+- Load demo data (5 habits, 4 weeks)
 """
 
 from datetime import datetime
@@ -22,7 +22,10 @@ from .analytics.analytics import (
 from .seed import load_fixture_into_db
 
 
+# -------------------- Helper Functions --------------------
+
 def _choose(prompt: str, options: List[str]) -> int:
+    """Display options and return user choice (1-based index)."""
     print(prompt)
     for i, opt in enumerate(options, start=1):
         print(f"  {i}. {opt}")
@@ -37,12 +40,15 @@ def _choose(prompt: str, options: List[str]) -> int:
 
 
 def _input_nonempty(prompt: str) -> str:
+    """Prompt until user enters a non-empty string."""
     while True:
         s = input(prompt).strip()
         if s:
             return s
         print("Value cannot be empty.")
 
+
+# -------------------- Main CLI --------------------
 
 def main() -> None:
     print("🌱 Habit Tracker (IU Portfolio) – JSON DB:", DEFAULT_DB_PATH)
@@ -66,8 +72,10 @@ def main() -> None:
 
         # 1) List all
         if choice == 1:
+            if not habits:
+                print("No habits found.")
             for h in list_all(habits):
-                print(f" - {h.name} [{h.periodicity}] created {h.created_at.date()} | completions={len(h.completed_datetimes)}")
+                print(f" - {h.name} [{h.periodicity}] created {h.created_at.date()} | completions={len(h.events)}")
 
         # 2) List by periodicity
         elif choice == 2:
@@ -104,7 +112,7 @@ def main() -> None:
             else:
                 print("Invalid selection.")
 
-        # 5) Complete
+        # 5) Mark completion
         elif choice == 5:
             if not habits:
                 print("No habits found.")
@@ -113,13 +121,13 @@ def main() -> None:
                 print(f"  {i}. {h.name} [{h.periodicity}]")
             idx = int(input("Choose habit to mark complete: "))
             if 1 <= idx <= len(habits):
-                habits[idx - 1].mark_complete()
+                habits[idx - 1].check_off()  # Updated API usage
                 save_habits(habits)
                 print(f"Marked '{habits[idx-1].name}' complete at now.")
             else:
                 print("Invalid selection.")
 
-        # 6) Longest streak across all
+        # 6) Longest streak overall
         elif choice == 6:
             name, streak = longest_run_streak_all(habits)
             if name is None:
@@ -142,7 +150,7 @@ def main() -> None:
             else:
                 print("Invalid selection.")
 
-        # 8) Seed demo
+        # 8) Seed demo data
         elif choice == 8:
             load_fixture_into_db()
             habits = load_habits()

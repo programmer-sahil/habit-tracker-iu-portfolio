@@ -1,11 +1,15 @@
 """
-Analytics implemented in a functional style (pure functions).
+Analytics module for Habit Tracker.
 
-Required by IU:
-- return list of all habits
-- return list of habits with the same periodicity
-- return longest run streak across all habits
-- return longest run streak for a given habit
+Implements pure functions to:
+- Return list of all habits
+- Return list of habits with the same periodicity
+- Return longest run streak across all habits
+- Return longest run streak for a given habit
+
+Streak Rules:
+- Daily: A streak continues only if there is at least one event on each consecutive day.
+- Weekly: A streak continues only if there is at least one event in each consecutive ISO week.
 """
 
 from datetime import datetime, timedelta
@@ -13,12 +17,23 @@ from typing import Iterable, List, Tuple, Optional
 from ..models import Habit
 
 
-# ---------- helpers (pure) -------------------------------------------------
+# -------------------- Helpers (Pure Functions) --------------------
+
 def _period_key(dt: datetime, periodicity: str) -> Tuple[int, int]:
     """
     Map a datetime to a (year, ordinal) key per periodicity.
-      daily  -> (year, day_of_year)
-      weekly -> (iso_year, iso_week)
+
+    Parameters
+    ----------
+    dt : datetime
+        Event timestamp
+    periodicity : str
+        Either 'daily' or 'weekly'
+
+    Returns
+    -------
+    Tuple[int, int]
+        (year, day_of_year) for daily or (iso_year, iso_week) for weekly
     """
     if periodicity == "daily":
         return (dt.year, dt.timetuple().tm_yday)
@@ -26,11 +41,24 @@ def _period_key(dt: datetime, periodicity: str) -> Tuple[int, int]:
         iso_year, iso_week, _ = dt.isocalendar()
         return (iso_year, iso_week)
     else:
-        raise ValueError("Invalid periodicity")
+        raise ValueError("Invalid periodicity; must be 'daily' or 'weekly'")
+
 
 def _previous_period_key(key: Tuple[int, int], periodicity: str) -> Tuple[int, int]:
     """
     Get the previous period key (one day or one ISO week earlier).
+
+    Parameters
+    ----------
+    key : Tuple[int, int]
+        Current period key
+    periodicity : str
+        Either 'daily' or 'weekly'
+
+    Returns
+    -------
+    Tuple[int, int]
+        Previous period key
     """
     if periodicity == "daily":
         year, day = key
@@ -39,44 +67,73 @@ def _previous_period_key(key: Tuple[int, int], periodicity: str) -> Tuple[int, i
         return (prev.year, prev.timetuple().tm_yday)
     else:  # weekly
         year, week = key
-        # Convert back to a date (Monday of the given ISO week)
-        # Monday of week `week` in ISO year `year`
-        # ISO week 1 is the week with the first Thursday of the year
         monday = _iso_to_monday(year, week)
         prev_monday = monday - timedelta(weeks=1)
         prev_iso_year, prev_iso_week, _ = prev_monday.isocalendar()
         return (prev_iso_year, prev_iso_week)
 
+
 def _iso_to_monday(iso_year: int, iso_week: int) -> datetime:
     """
     Return the Monday datetime for a given ISO year/week.
     """
-    # ISO: week starts Monday; week 01 has first Thursday of the year
-    # Start with Jan 4th, guaranteed to be in week 01
     jan4 = datetime(iso_year, 1, 4)
     iso1_monday = jan4 - timedelta(days=jan4.isoweekday() - 1)
     return iso1_monday + timedelta(weeks=iso_week - 1)
 
 
-# ---------- required analytics (pure) --------------------------------------
+# -------------------- Required Analytics Functions --------------------
+
 def list_all(habits: Iterable[Habit]) -> List[Habit]:
-    """Return all habits as a list."""
+    """
+    Return all habits as a list.
+
+    Parameters
+    ----------
+    habits : Iterable[Habit]
+
+    Returns
+    -------
+    List[Habit]
+    """
     return list(habits)
 
+
 def list_by_periodicity(habits: Iterable[Habit], periodicity: str) -> List[Habit]:
-    """Filter habits by periodicity ('daily' or 'weekly')."""
+    """
+    Filter habits by periodicity ('daily' or 'weekly').
+
+    Parameters
+    ----------
+    habits : Iterable[Habit]
+    periodicity : str
+
+    Returns
+    -------
+    List[Habit]
+    """
     return [h for h in habits if h.periodicity == periodicity]
+
 
 def longest_run_streak_for(habit: Habit) -> int:
     """
     Compute the *longest* streak of consecutive periods where the habit
     has at least one completion in each period.
+
+    Parameters
+    ----------
+    habit : Habit
+
+    Returns
+    -------
+    int
+        Longest streak for the habit
     """
-    if not habit.completed_datetimes:
+    if not habit.events:
         return 0
 
     # Build sorted unique period keys where completion exists
-    keys = sorted({_period_key(dt, habit.periodicity) for dt in habit.completed_datetimes})
+    keys = sorted({_period_key(ev.timestamp, habit.periodicity) for ev in habit.events})
 
     # Sweep to find longest consecutive chain
     best = 1
@@ -89,10 +146,19 @@ def longest_run_streak_for(habit: Habit) -> int:
             current = 1
     return best
 
+
 def longest_run_streak_all(habits: Iterable[Habit]) -> Tuple[Optional[str], int]:
     """
     Return (habit_name, longest_streak) across all habits.
-    If there are no habits, returns (None, 0).
+
+    Parameters
+    ----------
+    habits : Iterable[Habit]
+
+    Returns
+    -------
+    Tuple[Optional[str], int]
+        (habit_name, longest_streak). If no habits, returns (None, 0).
     """
     best_name = None
     best_val = 0
