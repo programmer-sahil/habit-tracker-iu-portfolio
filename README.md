@@ -8,6 +8,7 @@
 python -m venv .venv
 source .venv/bin/activate
 pip install -r requirements.txt
+```bash
 
 
 # 1) create env and install deps
