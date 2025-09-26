@@ -27,6 +27,16 @@ This project is developed according to the **IU Portfolio course requirements** 
 
 ---
 
+---
+
+### Notes
+- `data/habits.json` provides seed data for testing **daily** and **weekly** streaks, including examples where:
+  - Consecutive days/weeks demonstrate **full streaks**.
+  - Missing days/weeks demonstrate **streak breaks**.
+- This file ensures reproducible results for analytics functions, unit tests, and CLI demonstrations.
+
+
+
 ## Project Structure
 <img width="708" height="374" alt="image" src="https://github.com/user-attachments/assets/b69b903d-85a1-4007-b68e-641d0b464096" />
 
@@ -53,13 +63,5 @@ python -m habit_tracker.cli
 
 # 6) Run tests
 pytest -q
-
-
----
-
-### Notes
-- `data/habits.json` provides seed data for testing **daily** and **weekly** streaks, including examples where:
-  - Consecutive days/weeks demonstrate **full streaks**.
-  - Missing days/weeks demonstrate **streak breaks**.
-- This file ensures reproducible results for analytics functions, unit tests, and CLI demonstrations.
+```bash
 
