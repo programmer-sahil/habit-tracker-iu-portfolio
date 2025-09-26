@@ -41,7 +41,17 @@ This project is developed according to the **IU Portfolio course requirements** 
 ## Project Structure
 <img width="708" height="374" alt="image" src="https://github.com/user-attachments/assets/b69b903d-85a1-4007-b68e-641d0b464096" />
 
-## Setup
+
+---
+## Final Notes
+- **Seed Data:** The `data/habits.json` file contains predefined daily and weekly habits with timestamps to test streak calculations and gaps.
+- **Unit Tests:** Run `pytest -q` to verify all modules. All tests pass successfully.
+- **Persistence:** JSON storage auto-saves habit changes; CLI allows creating, deleting, and analyzing habits.
+- **Streak Rules:** Missing a day (daily) or week (weekly) breaks the streak automatically.
+- **GitHub & Submission:** Identical code in GitHub and ZIP submission as per formal requirements.
+
+---
+## Setup & Installation
 
 ```bash
 # 1) Create virtual environment
