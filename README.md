@@ -54,3 +54,5 @@ python -m habit_tracker.cli
 # 6) Run tests
 pytest -q
 
+
+Note: data/habits.json provides seed data for testing daily/weekly streaks and breaks
