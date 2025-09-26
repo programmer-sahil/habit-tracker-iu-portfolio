@@ -55,4 +55,11 @@ python -m habit_tracker.cli
 pytest -q
 
 
-Note: data/habits.json provides seed data for testing daily/weekly streaks and breaks
+---
+
+### Notes
+- `data/habits.json` provides seed data for testing **daily** and **weekly** streaks, including examples where:
+  - Consecutive days/weeks demonstrate **full streaks**.
+  - Missing days/weeks demonstrate **streak breaks**.
+- This file ensures reproducible results for analytics functions, unit tests, and CLI demonstrations.
+
