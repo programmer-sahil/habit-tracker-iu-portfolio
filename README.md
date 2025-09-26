@@ -39,7 +39,7 @@ This project is developed according to the **IU Portfolio course requirements** 
 ---
 
 ## Project Structure
-<img width="708" height="374" alt="image" src="https://github.com/user-attachments/assets/b69b903d-85a1-4007-b68e-641d0b464096" />
+<img width="453" height="237" alt="image" src="https://github.com/user-attachments/assets/1d06ac8b-a356-4949-af95-3e0d0f096e9f" />
 
 
 ---
